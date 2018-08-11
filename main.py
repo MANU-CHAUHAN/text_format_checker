@@ -8,23 +8,26 @@ pattern_web_url = re.compile(
 pattern_email = re.compile(r'([a-zA-Z]+[a-zA-Z0-9_.]*@[a-zA-Z._]+?\.(?:com|net|org|edu|gov))')
 
 
-def get_rid_of_mails_urls(txt):
-    '''check web urls or emails if any in txt.'''
+def get_email_url_indices(txt):
+    span_set = set()
 
-    urls_mails_set = set()
-    r = pattern_email.findall(txt)
+    r = pattern_email.finditer(txt)
     if r:
         for item in r:
-            urls_mails_set.add(item)
-            txt = txt.replace(item, '')
+            span_set.add(item.span())
 
     r = pattern_web_url.findall(txt)
     if r:
         for item in r:
-            urls_mails_set.add(item)
-            txt = txt.replace(item, '')
+            span_set.add(item.span())
 
-    return txt, urls_mails_set
+    nums = set()
+    for start, end in span_set:
+        if txt[start - 1] == ' ':
+            nums.add((start - 1, end))
+        else:
+            nums.add((start, end))
+    return {i for s, e in nums for i in range(s, e)}
 
 
 def check_text_format(text):
@@ -54,33 +57,29 @@ def check_text_format(text):
         mistakes['end_not_proper'] = True
         count += 1
 
-    # replace email/urls and the leading space in text
-    _, urls_emails = get_rid_of_mails_urls(txt=text)
-    for item in urls_emails:
-        loc = text.find(item)
-        if text[loc - 1] == ' ':
-            text = text[0:loc - 1] + text[loc + len(item):]
-        else:
-            text = text.replace(item)
-
     mistakes['extra_spaces'] = []
-    mistakes['space_before_.?!'] = []
+    mistakes['space_used_before_.?!'] = []
     mistakes['no_space_after_.?!'] = []
-    mistakes['small_case_after_._space'] = []
-    mistakes['capital_letter_missed_after_.'] = []
+    mistakes['capital_letter_missed_after_.?!_space'] = []
+    mistakes['capital_letter_missed_after_.?!'] = []
     mistakes['capital_case_after_small_case'] = []
 
     chars_dict = collections.defaultdict(int)
     previous_to_previous_state = previous_state = current_state = 0
     capital_letters = set(string.ascii_uppercase)
     small_letters_digits_special_chars_set = set(string.ascii_lowercase + string.digits + string.punctuation)
-    [small_letters_digits_special_chars_set.remove(x) for x in ['.', '?']]
+    [small_letters_digits_special_chars_set.remove(x) for x in ['.', '?', '!']]
 
     index = 1
     chars_dict[text[0]] += 1
     length = len(text)
 
+    indices_to_ignore = get_email_url_indices(text)
+
     while index < length:
+        if index in indices_to_ignore:
+            index += 1
+            continue
         char = text[index]
         chars_dict[char] += 1
 
@@ -100,7 +99,7 @@ def check_text_format(text):
 
         # check if space before '.'
         if current_state == 3 and previous_state == 1:
-            mistakes['space_before_.?!'].append(index - 1)
+            mistakes['space_used_before_.?!'].append(index - 1)
             count += 1
 
         # check if space after space -> extra space used
@@ -115,7 +114,7 @@ def check_text_format(text):
 
         # ...blah. abc -> small case after '.' and space
         if previous_to_previous_state == 3 and previous_state == 1 and current_state == 2:
-            mistakes['small_case_after_._space'].append(index)
+            mistakes['capital_letter_missed_after_.?!_space'].append(index)
             count += 1
 
         # no space after '.'
@@ -125,7 +124,7 @@ def check_text_format(text):
 
         # small letter after .
         if current_state == 2 and previous_state == 3:
-            mistakes['capital_letter_missed_after_.'].append(index)
+            mistakes['capital_letter_missed_after_.?!'].append(index)
             count += 1
 
         index += 1
@@ -151,11 +150,11 @@ def check_text_format(text):
         mistakes['<_>_mismatch'] = True
         count += 1
 
-    return text, count, mistakes
+    return count, mistakes
 
 
 if __name__ == '__main__':
     s = "hello .hoW are you www.abc@xyz.com? i hope all  good"
-    t, c, d = check_text_format(s)
-    print('\n', t, '\n', c)
-    [print(x) for x in d.items()]
+    c, m = check_text_format(s)
+    print(s, '\n', c)
+    [print(x) for x in m.items()]
