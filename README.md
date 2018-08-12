@@ -31,24 +31,24 @@ print('\n', t, '\n', c)
 #### Output:
 -----------------
 
-hello .hoW are you? i hope all  good 
+hello .hoW are you www.abc@xyz.com? i hope all  good
 
 8
 
+('capital_case_after_small_case', [9])
+
+('extra_spaces', [47])
+
+('capital_letter_missed_after_.?!', [7])
+
 ('no_space_after_.?!', [7])
 
-('small_case_after_._space', [20])
-
-('capital_case_after_small_case', [9])
+('space_used_before_.?!', [5])
 
 ('start_letter_not_capital', True)
 
-('extra_spaces', [31])
+('capital_letter_missed_after_.?!_space', [36])
 
 ('end_not_proper', True)
 
-('capital_letter_missed_after_.', [7])
-
-('space_before_.?!', [5])
-
-Note: here each number in list of dictionary refers to the corresponding index of the error in the text.
+Note: here each number in list of the dictionary refers to the corresponding index of the error in the text.
