@@ -16,7 +16,7 @@ def get_email_url_indices(txt):
         for item in r:
             span_set.add(item.span())
 
-    r = pattern_web_url.findall(txt)
+    r = pattern_web_url.finditer(txt)
     if r:
         for item in r:
             span_set.add(item.span())
@@ -154,7 +154,7 @@ def check_text_format(text):
 
 
 if __name__ == '__main__':
-    s = "hello .hoW are you www.abc@xyz.com? i hope all  good"
+    s = "hello .hoW are you www.xyz.com? i hope all  good"
     c, m = check_text_format(s)
     print(s, '\n', c)
     [print(x) for x in m.items()]
