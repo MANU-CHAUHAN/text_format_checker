@@ -13,7 +13,7 @@ After checking and removing valid emails and web urls, the program checks for th
 7) match number of opening and closing for different types of brackets, `<` & `>`, `(` & `)`, `{` & `}`, `[` & `]` 
 
 
-#### TODO: Readjust the indices as per original text having emails/urls
+#### TODO: add other checks later.
 ________________________________________________________________________________________________________________________________________
 
 The function, in main.py, takes text to be checked and returns the total count of mistakes along with a dictionary of the mistakes. The values in dictionary are either bool type or list containing indices in text where mistake was recorded. 
