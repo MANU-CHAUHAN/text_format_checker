@@ -20,7 +20,7 @@ The function, in main.py, takes text to be checked and returns the total count o
 
 Eg:
 
-s = "hello .hoW are you www.abc@xyz.com? i hope all  good"
+s = "hello .hoW are you www.xyz.com? i hope all  good"
 
 t, c, d = check_text_format(s)
 
@@ -31,24 +31,25 @@ print('\n', t, '\n', c)
 #### Output:
 -----------------
 
-hello .hoW are you www.abc@xyz.com? i hope all  good
+hello .hoW are you www.xyz.com? i hope all  good
 
 8
 
-('capital_case_after_small_case', [9])
-
-('extra_spaces', [47])
-
 ('capital_letter_missed_after_.?!', [7])
+
+('end_not_proper', True)
 
 ('no_space_after_.?!', [7])
 
-('space_used_before_.?!', [5])
+('capital_letter_missed_after_.?!_space', [32])
 
 ('start_letter_not_capital', True)
 
-('capital_letter_missed_after_.?!_space', [36])
+('capital_case_after_small_case', [9])
 
-('end_not_proper', True)
+('space_used_before_.?!', [5])
+
+('extra_spaces', [43])
+
 
 Note: here each number in list of the dictionary refers to the corresponding index of the error in the text.
