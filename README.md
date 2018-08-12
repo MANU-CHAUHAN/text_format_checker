@@ -51,4 +51,4 @@ hello .hoW are you? i hope all  good
 
 ('space_before_.?!', [5])
 
-Note: here each number in list of dictionary refers to the index in the text after removal of emails/urls.
+Note: here each number in list of dictionary refers to the corresponding index of the error in the text.
