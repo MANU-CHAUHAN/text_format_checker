@@ -52,7 +52,6 @@ def check_text_format(texts):
     flag = False
     for text in texts:
         if text:
-            # text = text.strip()
             mistakes = {}
             count = 0
             # check if the text starts and contains only email/url
@@ -60,11 +59,11 @@ def check_text_format(texts):
             url = pattern_web_url.match(text)
             if email:
                 s, e = email.span()
-                if e - s in [len(text), len(text) - 1]:
+                if e - s == len(text):
                     flag = True
             if url:
                 s, e = url.span()
-                if e - s in [len(text), len(text) - 1]:
+                if e - s == len(text):
                     flag = True
             if not flag:
                 first = text[0]
@@ -93,9 +92,6 @@ def check_text_format(texts):
                 indices_to_ignore = get_email_url_ignore_word_indices(text)
 
                 while index < length:
-                    if index in indices_to_ignore:
-                        index += 1
-                        continue
                     char = text[index]
                     chars_dict[char] += 1
 
@@ -116,6 +112,12 @@ def check_text_format(texts):
 
                     if char in punctuations:
                         current_state = 5
+
+                    if index in indices_to_ignore:
+                        index += 1
+                        previous_to_previous_state = previous_state
+                        previous_state = current_state
+                        continue
 
                     '''checks for states'''
 
@@ -183,8 +185,10 @@ def check_text_format(texts):
 
 
 if __name__ == '__main__':
-    s1 = "hello .hoW are you www.xyz.com? i hope all  good"
+    s1 = "hello .hoW are you www.xyz.com? i hope all  good. iPhone is working now."
     s2 = "hey, where is  your iPhone"
-    data, total_mistakes = check_text_format([s1, s2])
+    s3 = "abc@xyz.com"
+
+    data, total_mistakes = check_text_format([s1, s2, s3])
     print('\nTotal mistakes: ', total_mistakes, '\n')
     [print('Text number: {0}    Info dict: {1}'.format(i, x)) for i, x in enumerate(data)]
