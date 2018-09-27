@@ -1,4 +1,5 @@
 import re
+import nltk
 import string
 import collections
 
@@ -7,7 +8,17 @@ pattern_web_url = re.compile(
 
 pattern_email = re.compile(r'([a-zA-Z]+[a-zA-Z0-9_.]*@[a-zA-Z._]+?\.(?:com|net|org|edu|gov))')
 
-ignore_words = ['iPad', 'iPhone']
+ignore_words = set(['iPad', 'iPhone'])
+
+
+def named_entity_checker(text):
+    entities = set()
+    for entity in nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(text))):
+        if isinstance(entity, nltk.tree.Tree):
+            etext = " ".join([word for word, tag in entity.leaves()])
+            # label = entity.label()
+            entities.add(etext)
+    return entities
 
 
 def get_email_url_ignore_word_indices(txt):
@@ -23,6 +34,10 @@ def get_email_url_ignore_word_indices(txt):
         for item in r:
             span_set.add(item.span())
     nums = set()
+
+    # check for named entities, which needs to be removed, and update ignore words set
+    ignore_words.update(named_entity_checker(text=txt))
+
     r = [re.finditer(r'\b{}\b'.format(w.lower()), txt.lower()) for w in ignore_words]
 
     for i in r:
@@ -186,7 +201,7 @@ def check_text_format(texts):
 
 if __name__ == '__main__':
     s1 = "hello .hoW are you www.xyz.com? i hope all  good. iPhone is working now."
-    s2 = "hey, where is  your iPhone"
+    s2 = "I work at Google. where do you work?"
     s3 = "abc@xyz.com"
 
     data, total_mistakes = check_text_format([s1, s2, s3])
